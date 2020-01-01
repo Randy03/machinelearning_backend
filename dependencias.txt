@@ -1,0 +1,7 @@
+django
+djangorestframework_simplejwt
+djangorestframework-jwt
+django-cors-headers
+pandas
+matplotlib
+scikit-learn
