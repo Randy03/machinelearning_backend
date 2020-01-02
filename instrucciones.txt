@@ -19,3 +19,4 @@ insert into myapp_mlmodel values (1,'Regresion','Lineal',null),
 
 para ver todas las funciones bajar el frontend y cargar alguno de los datasets de este repositorio o cualquier otro
 es necesario clasificar bien cada columna al cargar el dataset
+la aplicacion tiene control de usuarios, por lo que es necesario dar de alta un usuario para utilizar las funciones
