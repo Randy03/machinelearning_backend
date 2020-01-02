@@ -16,8 +16,8 @@ router.register(r'mlmodel', views.MLModelViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('item/',views.ItemApiView.as_view()),
-    path('item/<int:id>', views.ItemApiView.as_view()),
+    #path('item/',views.ItemApiView.as_view()),
+    #path('item/<int:id>', views.ItemApiView.as_view()),
     path('dataset/',views.DatasetApiView.as_view()),
     path('datasetcolumn/',views.DataSetColumnApiView.as_view()),
     path('dataset/<int:id>', views.DatasetApiView.as_view()),
