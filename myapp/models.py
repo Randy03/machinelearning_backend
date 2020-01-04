@@ -40,7 +40,7 @@ class DataSetColumns(models.Model):
     
 
 class DataSetInfo():
-    def __init__(self,name,desc,x_cols,y_col,length,values):
+    def __init__(self,name,desc,x_cols,y_col,length,values=None):
         self.name = name 
         self.description = desc
         self.x_cols = x_cols

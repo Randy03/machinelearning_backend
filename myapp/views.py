@@ -93,7 +93,7 @@ class DatasetApiView(views.APIView):
                 datasetPath = dataset.file.path
             else:
                 datasetPath = dataset.url            
-            values,length = getDataFrameValues(datasetPath,200)
+            values,length = getDataFrameValues(datasetPath,200,dataset.sep)
             #x_col, length = getDataFrameInfo(dataset.url,dataset.y_column_name)
             x_cols_types = [(r.column_name,r.column_type) for r in DataSetColumns.objects.filter(Q(column_type='Continue') | Q(column_type='Category') ,iddataset=dataset._id)]
             x_cols = []
@@ -101,14 +101,14 @@ class DatasetApiView(views.APIView):
             if (len(x_cols_types)>0):
                 for x in x_cols_types:
                     if (x[1]=='Category'):
-                        x_cols.append([x[0],getCategoriesOfColumn(dataset.url,x[0])])  
+                        x_cols.append([x[0],getCategoriesOfColumn(dataset.url,x[0],dataset.sep)])  
                     else:
                         x_cols.append([x[0],[]])  
             else:
-                x_cols = getDataFrameColumns(datasetPath)
+                x_cols = getDataFrameColumns(datasetPath,dataset.sep)
             y_col = [r.column_name for r in DataSetColumns.objects.filter(column_type='Target',iddataset=dataset._id)]
-            sz = DataSetInfoSerializer(DataSetInfo(dataset.name,dataset.description,x_cols,y_col,length,values))
-        #print(items)
+            sz = DataSetInfoSerializer(DataSetInfo(dataset.name,dataset.description,x_cols,y_col,length))
+            #print(sz.data)
     
         return Response(sz.data)
         #return Response({"items":items})
@@ -118,6 +118,7 @@ class DatasetApiView(views.APIView):
       file_serializer = DataSetSerializer(data=request.data)
 
       if file_serializer.is_valid():
+
           file_serializer.save()
           return Response(file_serializer.data, status=status.HTTP_201_CREATED)
       else:

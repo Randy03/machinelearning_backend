@@ -1,6 +1,7 @@
 #from .models import Item, User,MLModel,DataSet,EvalInput,LinearRegressionInput
 from .models import *
 from rest_framework import serializers
+from .ML.dataset_functions import getDataFrameValues,getDataFrameColumns,getCategoriesOfColumn
 
 
 class ItemSerializer(serializers.Serializer):
@@ -66,6 +67,13 @@ class DataSetSerializer(serializers.Serializer):
             for column in columns_data:
                 DataSetColumns.objects.create(iddataset=ds,**column)
         except:
+            if (ds.file is not None):
+                datasetPath = ds.file.path
+            else:
+                datasetPath = ds.url 
+            columns = getDataFrameColumns(datasetPath,ds.sep)
+            for c in columns:
+                DataSetColumns.objects.create(iddataset=ds,column_name=c)
             return ds
         return ds
     
@@ -96,7 +104,7 @@ class DataSetInfoSerializer(serializers.Serializer):
     x_cols = serializers.JSONField()
     y_col = serializers.CharField(max_length=100)
     length = serializers.IntegerField()
-    values = serializers.JSONField()
+    values = serializers.JSONField(required=False)
 
 
 
