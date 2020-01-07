@@ -4,6 +4,7 @@ import numpy as np
 import random as rnd
 import base64
 import io
+from collections import defaultdict
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFE
 from sklearn.preprocessing import PolynomialFeatures
@@ -55,9 +56,10 @@ class MLApp():
             if (deg==pol_degree):
                 break
             for y in column_names:
-                temp_list = []
-                for item in x:
-                    temp_list.append(item)  
+                #temp_list = []
+                #for item in x:
+                #    temp_list.append(item)
+                temp_list = x.copy()
                 add_validation = False         
                 if (features_dict[x[-1]]<=features_dict[y] and  len(temp_list)<deg+1):                                
                     temp_list.append(y)
@@ -72,6 +74,12 @@ class MLApp():
         
         return feature_list_final
     
+    def isaNumber(self,input):
+        try:
+            float(input)
+            return True
+        except:
+            return False
 
     def prepareDataset(self,fillNaCols,replaceValueCols):
         Y =None
@@ -81,46 +89,31 @@ class MLApp():
         else:
             X = self.data
         
+        switcher_dict = {
+            'MEAN VALUE': lambda x,y: pd.to_numeric(x[x[y].apply(self.isaNumber)][y], errors='coerce').mean(),
+            'MEDIAN VALUE': lambda x,y: pd.to_numeric(x[x[y].apply(self.isaNumber)][y], errors='coerce').median(),
+            'MODE VALUE': lambda x,y: x[y].mode()[0]
+        }
+ 
+
         if (fillNaCols is not None):
             for key in fillNaCols:
-                if(fillNaCols[key]=='MEAN VALUE'):
-                    mn = X[X[key].str.isnumeric()]
-                    mn = pd.to_numeric(mn[key], errors='coerce')
-                    mn = mn.mean()                    
-                    X[key] = X[key].fillna(mn)
-                else:
-                    if(fillNaCols[key]=='MEDIAN VALUE'):
-                        md = X[X[key].str.isnumeric()]
-                        md = pd.to_numeric(md[key], errors='coerce')
-                        md = md.median()                        
-                        X[key] = X[key].fillna(md)
-                    else:
-                        if(fillNaCols[key]=='MODE VALUE'):
-                            X[key] = X[key].fillna(X[key].mode())
-                        else:
-                            X[key] = X[key].fillna(fillNaCols[key])
-                
+                try:
+                    function_to_apply = switcher_dict[fillNaCols[key]]
+                    replace_value = function_to_apply(X,key)
+                except KeyError:
+                    replace_value = fillNaCols[key]
+                X[key] = X[key].fillna(replace_value)
+      
         if(replaceValueCols is not None):
             for key in replaceValueCols:
                 for value in replaceValueCols[key]:
-                    if(value[1]=='MEAN VALUE'):
-                        mn = X[X[key].str.isnumeric()]
-                        mn = pd.to_numeric(mn[key], errors='coerce')
-                        mn = mn.mean()
-                        X[key] = X[key].replace(to_replace=value[0],value=mn)               
-                    else:
-                        if(value[1]=='MEDIAN VALUE'):
-                            md = X[X[key].str.isnumeric()]
-                            md = pd.to_numeric(md[key], errors='coerce')
-                            md = md.median()
-                            X[key] = X[key].replace(to_replace=value[0],value=md)
-                        else:
-                            if(value[1]=='MODE VALUE'):
-                                md =X[key].mode()
-                                print(md)
-                                X[key] = X[key].replace(to_replace=value[0],value=md[0])
-                            else:
-                                X[key] = X[key].replace(to_replace=value[0],value=value[1])                   
+                    try:
+                        function_to_apply = switcher_dict[value[1]]
+                        replace_value = function_to_apply(X,key)
+                    except KeyError:
+                        replace_value = value[1]
+                    X[key] = X[key].replace(to_replace=value[0],value=replace_value)                                       
 
         if len(self.idcolumns)>0:
             X = X.drop(self.idcolumns,axis = 1)
