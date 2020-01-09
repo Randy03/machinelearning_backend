@@ -1,0 +1,22 @@
+ejecutar python manage.py migrate
+en caso de que de error, realizar las migraciones en este orden
+migrate auth
+migrate myapp
+migrate admin
+migrate sessions
+
+cargar los modelos en la base sqllite con las siguientes querys
+insert into myapp_mlmodel values (1,'Regresion','Lineal',null),
+(2,'Regresion','Logistica',null),
+(3,'Clustering','Jerarquico',null),
+(4,'Clustering','K-Means',null),
+(5,'Arbol','Regresion',null),
+(6,'Arbol','Clasificacion',null),
+(7,'Random forest','Regresion',null),
+(8,'Random forest','Clasificacion',null),
+(9,'SVM','Regresion',null),
+(10,'SVM','Clasificacion',null)
+
+para ver todas las funciones bajar el frontend y cargar alguno de los datasets de este repositorio o cualquier otro
+es necesario clasificar bien cada columna al cargar el dataset
+la aplicacion tiene control de usuarios, por lo que es necesario dar de alta un usuario para utilizar las funciones
